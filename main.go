@@ -38,8 +38,6 @@ func main() {
 		TCPTun     string
 		UDPTun     string
 		UDPSocks   bool
-		Plugin     string
-		PluginOpts string
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
@@ -55,8 +53,6 @@ func main() {
 	flag.StringVar(&flags.RedirTCP6, "redir6", "", "(client-only) redirect TCP IPv6 from this address")
 	flag.StringVar(&flags.TCPTun, "tcptun", "", "(client-only) TCP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
 	flag.StringVar(&flags.UDPTun, "udptun", "", "(client-only) UDP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
-	flag.StringVar(&flags.Plugin, "plugin", "", "Enable SIP003 plugin. (e.g., v2ray-plugin)")
-	flag.StringVar(&flags.PluginOpts, "plugin-opts", "", "Set SIP003 plugin options. (e.g., \"server;tls;host=mydomain.me\")")
 	flag.DurationVar(&config.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
 	flag.Parse()
 
@@ -99,13 +95,6 @@ func main() {
 		ciph, err := core.PickCipher(cipher, key, password)
 		if err != nil {
 			log.Fatal(err)
-		}
-
-		if flags.Plugin != "" {
-			addr, err = startPlugin(flags.Plugin, flags.PluginOpts, addr, false)
-			if err != nil {
-				log.Fatal(err)
-			}
 		}
 
 		if flags.UDPTun != "" {
@@ -154,13 +143,6 @@ func main() {
 
 		udpAddr := addr
 
-		if flags.Plugin != "" {
-			addr, err = startPlugin(flags.Plugin, flags.PluginOpts, addr, true)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-
 		ciph, err := core.PickCipher(cipher, key, password)
 		if err != nil {
 			log.Fatal(err)
@@ -173,7 +155,6 @@ func main() {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
-	killPlugin()
 }
 
 func parseURL(s string) (addr, cipher, password string, err error) {
