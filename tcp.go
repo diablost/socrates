@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 	"time"
+	"fmt"
 
 	"github.com/shadowsocks/go-shadowsocks2/socks"
 )
@@ -73,10 +74,18 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 			rc.(*net.TCPConn).SetKeepAlive(true)
 			rc = shadow(rc)
 
-			if _, err = rc.Write(tgt); err != nil {
+			if _, err := rc.Write(tgt); err != nil {
 				logf("failed to send target address: %v", err)
 				return
 			}
+
+			buf := make([]byte, 8192)
+			n, err := rc.Read(buf)
+			if err != nil {
+				fmt.Println("========================", err)
+			}
+			fmt.Println("========================", n)
+			// client <-> (obfs <-> obfs-server) <-> server
 
 			logf("proxy %s <-> %s <-> %s", c.RemoteAddr(), server, tgt)
 			_, _, err = relay(rc, c)

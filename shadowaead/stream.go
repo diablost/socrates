@@ -6,6 +6,8 @@ import (
 	"crypto/rand"
 	"io"
 	"net"
+
+	"socrates/obfs"
 )
 
 // payloadSizeMask is the maximum size of payload in bytes.
@@ -56,7 +58,9 @@ func (w *writer) ReadFrom(r io.Reader) (n int64, err error) {
 			w.Seal(payloadBuf[:0], w.nonce, payloadBuf, nil)
 			increment(w.nonce)
 
-			_, ew := w.Writer.Write(buf)
+			ew := obfs.HTTPRequest(w.Writer, buf)
+
+			//_, ew := w.Writer.Write(buf)
 			if ew != nil {
 				err = ew
 				break
