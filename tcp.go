@@ -4,7 +4,6 @@ import (
 	"io"
 	"net"
 	"time"
-	"fmt"
 
 	"github.com/shadowsocks/go-shadowsocks2/socks"
 )
@@ -79,13 +78,8 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 				return
 			}
 
-			buf := make([]byte, 8192)
-			n, err := rc.Read(buf)
-			if err != nil {
-				fmt.Println("========================", err)
-			}
-			fmt.Println("========================", n)
-			// client <-> (obfs <-> obfs-server) <-> server
+			// for dummy cipher
+			//obfs.HTTPRequest(rc, tgt, c)
 
 			logf("proxy %s <-> %s <-> %s", c.RemoteAddr(), server, tgt)
 			_, _, err = relay(rc, c)

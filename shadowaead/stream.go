@@ -58,9 +58,8 @@ func (w *writer) ReadFrom(r io.Reader) (n int64, err error) {
 			w.Seal(payloadBuf[:0], w.nonce, payloadBuf, nil)
 			increment(w.nonce)
 
-			ew := obfs.HTTPRequest(w.Writer, buf)
+			_, ew := w.Writer.Write(buf)
 
-			//_, ew := w.Writer.Write(buf)
 			if ew != nil {
 				err = ew
 				break
@@ -200,9 +199,32 @@ type streamConn struct {
 	Cipher
 	r *reader
 	w *writer
+
 }
 
 func (c *streamConn) initReader() error {
+
+	i := 0
+	buf := make([]byte, 1)
+	slots := make([]byte, 4)
+	header := []byte{13, 10, 13, 10}
+	for {
+		_, err := io.ReadFull(c.Conn, buf)
+		if err != nil {
+			return err
+		}
+		if buf[0] == 13 || buf[0] == 10 {
+			slots[i] = buf[0]
+			if i == 3 && bytes.Compare(slots, header) == 0 {
+				break
+			}
+			i++
+		} else {
+			i = 0
+			slots = []byte{0, 0, 0, 0}
+		}
+	}
+
 	salt := make([]byte, c.SaltSize())
 	if _, err := io.ReadFull(c.Conn, salt); err != nil {
 		return err
@@ -244,7 +266,9 @@ func (c *streamConn) initWriter() error {
 	if err != nil {
 		return err
 	}
-	_, err = c.Conn.Write(salt)
+
+	err = obfs.HTTPRequest(c.Conn, salt)
+
 	if err != nil {
 		return err
 	}
