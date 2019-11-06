@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"socrates/socks"
+	"gitlab.com/isocs/socrates/socks"
 )
 
 // Create a SOCKS server listening on addr and proxy to server.

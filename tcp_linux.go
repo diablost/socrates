@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"socrates/socks"
+	"gitlab.com/isocs/socrates/socks"
 )
 
 const (

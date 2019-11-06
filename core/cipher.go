@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"socrates/shadowaead"
-	"socrates/shadowstream"
+	"gitlab.com/isocs/socrates/shadowaead"
+	"gitlab.com/isocs/socrates/shadowstream"
 )
 
 type Cipher interface {

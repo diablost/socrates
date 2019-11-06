@@ -1,4 +1,4 @@
-module github.com/shadowsocks/go-shadowsocks2
+module gitlab.com/isocs/socrates
 
 go 1.12
 
