@@ -43,6 +43,7 @@ func main() {
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
+	flag.BoolVar(&flags.Discovery, "discovery", false, "proxy address discovery mode")
 	flag.StringVar(&flags.Cipher, "cipher", "AEAD_CHACHA20_POLY1305", "available ciphers: "+strings.Join(core.ListCipher(), " "))
 	flag.StringVar(&flags.Key, "key", "", "base64url-encoded key (derive from password if empty)")
 	flag.IntVar(&flags.Keygen, "keygen", 0, "generate a base64url-encoded random key of given length in byte")
@@ -80,11 +81,27 @@ func main() {
 		key = k
 	}
 
+	var ac AccessControl
+	if flags.AccessList != "" {
+		mapAccess := make(map[string] bool)
+		ar := strings.Split(flags.AccessList, ",")
+		for i := range ar {
+			mapAccess[ar[i]] = true
+		}
+		ac.whiteList = mapAccess
+	}
+
 	if flags.Client != "" { // client mode
 		addr := flags.Client
 		cipher := flags.Cipher
 		password := flags.Password
 		var err error
+
+		if flags.Discovery == true {
+			c := make(chan int, 1)
+			dAddr := Discovery(c)
+			addr = dAddr[0]
+		}
 
 		if strings.HasPrefix(addr, "ss://") {
 			addr, cipher, password, err = parseURL(addr)
@@ -152,7 +169,7 @@ func main() {
 		}
 
 		go udpRemote(udpAddr, ciph.PacketConn)
-		go tcpRemote(addr, ciph.StreamConn, flags.AccessList)
+		go tcpRemote(addr, ciph.StreamConn, ac)
 	}
 
 	sigCh := make(chan os.Signal, 1)

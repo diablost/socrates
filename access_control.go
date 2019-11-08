@@ -15,9 +15,11 @@ func (a *AccessControl) access(path string) bool {
 
 		regStr := fmt.Sprintf("`(?i:^%s).*`",k)
 		reg := regexp.MustCompile(regStr)
-		fmt.Printf("%q\n", reg.FindAllString(path, -1))
+		if reg.FindAllString(path, -1) != nil {
+			return true
+		}
 	}
-	return true
+	return false
 }
 
 func (a *AccessControl) trafficControl() {
