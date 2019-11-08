@@ -117,14 +117,14 @@ func tcpRemote(addr string, shadow func(net.Conn) net.Conn, ac AccessControl) {
 
 			tgt, err := socks.ReadAddr(c)
 
-			// access control
-			// traffic control
-			if ac.access(tgt.String()) == false {
+			if err != nil {
+				logf("failed to get target address: %v", err)
 				return
 			}
 
-			if err != nil {
-				logf("failed to get target address: %v", err)
+			// access control
+			// traffic control
+			if ac.access(tgt.String()) == false {
 				return
 			}
 

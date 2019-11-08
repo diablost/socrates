@@ -11,13 +11,10 @@ type AccessControl struct {
 
 func (a *AccessControl) access(path string) bool {
 	for k, v := range a.whiteList {
-		fmt.Println(k, v)
-
-		regStr := fmt.Sprintf("`(?i:^%s).*`",k)
-		reg := regexp.MustCompile(regStr)
-		if reg.FindAllString(path, -1) != nil {
-			return true
-		}
+		regStr := fmt.Sprintf(`%s`, k)
+		reg, _ := regexp.Compile(regStr)
+		fmt.Println(k, v, reg.MatchString(path))
+		return reg.MatchString(path)
 	}
 	return false
 }
