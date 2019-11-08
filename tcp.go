@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"gitlab.com/isocs/socrates/socks"
+	"fmt"
+	"strings"
 )
 
 // Create a SOCKS server listening on addr and proxy to server.
@@ -94,7 +96,14 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 }
 
 // Listen on addr for incoming connections.
-func tcpRemote(addr string, shadow func(net.Conn) net.Conn) {
+func tcpRemote(addr string, shadow func(net.Conn) net.Conn, accessList string) {
+
+	mapAccess := make(map[string] bool)
+	ar := strings.Split(accessList, ",")
+	for i := range ar {
+		mapAccess[ar[i]] = true
+	}
+
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		logf("failed to listen on %s: %v", addr, err)
@@ -115,6 +124,14 @@ func tcpRemote(addr string, shadow func(net.Conn) net.Conn) {
 			c = shadow(c)
 
 			tgt, err := socks.ReadAddr(c)
+
+			// access control
+			// traffic control
+			if access, val := mapAccess[tgt.String()]; access == false {
+				fmt.Println("--------------------denied:", val)
+				return
+			}
+
 			if err != nil {
 				logf("failed to get target address: %v", err)
 				return

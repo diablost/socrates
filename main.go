@@ -38,6 +38,8 @@ func main() {
 		TCPTun     string
 		UDPTun     string
 		UDPSocks   bool
+		AccessList string
+		Discovery  bool
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
@@ -54,6 +56,7 @@ func main() {
 	flag.StringVar(&flags.TCPTun, "tcptun", "", "(client-only) TCP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
 	flag.StringVar(&flags.UDPTun, "udptun", "", "(client-only) UDP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
 	flag.DurationVar(&config.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
+	flag.StringVar(&flags.AccessList, "accesslist", "", "remote access whitelist")
 	flag.Parse()
 
 	if flags.Keygen > 0 {
@@ -149,7 +152,7 @@ func main() {
 		}
 
 		go udpRemote(udpAddr, ciph.PacketConn)
-		go tcpRemote(addr, ciph.StreamConn)
+		go tcpRemote(addr, ciph.StreamConn, flags.AccessList)
 	}
 
 	sigCh := make(chan os.Signal, 1)
