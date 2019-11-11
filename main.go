@@ -101,11 +101,11 @@ func main() {
 		password := flags.Password
 		var err error
 
-		if flags.Discovery == true {
-			c := make(chan int, 1)
-			dAddr := Discovery(c)
-			addr = dAddr[0]
-		}
+		//if flags.Discovery == true {
+		//	c := make(chan int, 1)
+		//	dAddr := Discovery(c)
+		//	addr = dAddr[0]
+		//}
 
 		if strings.HasPrefix(addr, "ss://") {
 			addr, cipher, password, err = parseURL(addr)

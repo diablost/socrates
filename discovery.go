@@ -49,6 +49,7 @@ func Discovery(c chan int) []string {
 
 	newAddr := fmt.Sprintf(ssTemplate, string(newHost))
 	hosts = append(hosts, string(newAddr))
+	log.Println("=-------------", hosts)
 	return hosts
 }
 
@@ -60,7 +61,7 @@ func getContractData(cli *ethclient.Client) []byte {
 
 	ret, err := cli.PendingStorageAt(context.Background(), contractid, pos)
 	if err != nil {
-		log.Println("get contract data error occurs:", err)
+		log.Fatal("get contract data error occurs:", err)
 	}
 
 	return ret
@@ -86,6 +87,6 @@ func getHeader(cli *ethclient.Client) (string, error) {
 	return header.Number.String(), err
 }
 
-func updateContract(){
+func updateContract() {
 
 }

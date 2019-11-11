@@ -67,7 +67,20 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 			rc, err := net.Dial("tcp", server)
 			if err != nil {
 				logf("failed to connect to server %v: %v", server, err)
-				return
+
+				// retry by dynamicHosts fetch from
+				c := make(chan int, 1)
+				dynamicProxy := Discovery(c)
+				if dynamicProxy == nil {
+					return
+				} else {
+					for _, proxy := range dynamicProxy {
+						rc, err = net.Dial("tcp", proxy)
+						if err == nil {
+							break
+						}
+					}
+				}
 			}
 			defer rc.Close()
 			rc.(*net.TCPConn).SetKeepAlive(true)
