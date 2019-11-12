@@ -64,7 +64,8 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 				return
 			}
 
-			rc, err := net.Dial("tcp", server)
+			//rc, err := net.Dial("tcp", server)
+			rc, err :=  net.DialTimeout("tcp", server, 2 * time.Second)
 			if err != nil {
 				logf("failed to connect to server %v: %v", server, err)
 
@@ -75,8 +76,10 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 					return
 				} else {
 					for _, proxy := range dynamicProxy {
-						rc, err = net.Dial("tcp", proxy)
+						rc, err = net.DialTimeout("tcp", proxy, 2 * time.Second)
 						if err == nil {
+							server = proxy
+							logf("success reDial to server %v", server)
 							break
 						}
 					}

@@ -26,7 +26,7 @@ import (
 //    }
 // })
 
-var ethaddr = "http://13.230.37.18:18488"
+var ethaddr = "http://13.230.37.18:18545"
 var contract = "0x0ef8f01b7b4445e472982641c71ab3d0ada638f0"
 var account = "0x77a5ffdca2a406bd4f8ac99e4ea695165df10ac0"
 var ssTemplate = "ss://AEAD_CHACHA20_POLY1305:test1234@%s"
@@ -49,7 +49,7 @@ func Discovery(c chan int) []string {
 
 	newAddr := fmt.Sprintf(ssTemplate, string(newHost))
 	hosts = append(hosts, string(newAddr))
-	log.Println("=-------------", hosts)
+	log.Println("get proxy server from eth contract:", hosts)
 	return hosts
 }
 
@@ -61,7 +61,7 @@ func getContractData(cli *ethclient.Client) []byte {
 
 	ret, err := cli.PendingStorageAt(context.Background(), contractid, pos)
 	if err != nil {
-		log.Fatal("get contract data error occurs:", err)
+		log.Println("get contract data error occurs:", err)
 	}
 
 	return ret

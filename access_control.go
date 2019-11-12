@@ -10,6 +10,9 @@ type AccessControl struct {
 }
 
 func (a *AccessControl) access(path string) bool {
+	if a.whiteList == nil {
+		return true
+	}
 	for k, _ := range a.whiteList {
 		regStr := fmt.Sprintf(`%s`, k)
 		reg, _ := regexp.Compile(regStr)
