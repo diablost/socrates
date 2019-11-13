@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 	"log"
+	"math/big"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -13,7 +13,7 @@ import (
 
 // personal.unlockAccount(eth.accounts[2], "discovery")
 
-//var _greeting = "13.230.37.18:18488" ;var helloContract = web3.eth.contract([{"constant":true,"inputs":[],"name":"say","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_greeting","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]);var hello = helloContract.new(
+//var _greeting = "13.230.37.18:18488,13.230.37.18:8488" ;var helloContract = web3.eth.contract([{"constant":true,"inputs":[],"name":"say","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_greeting","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]);var hello = helloContract.new(
 //   _greeting,
 //   {
 //     from: web3.eth.accounts[2],
@@ -27,44 +27,81 @@ import (
 // })
 
 var ethaddr = "http://13.230.37.18:18545"
-var contract = "0x0ef8f01b7b4445e472982641c71ab3d0ada638f0"
+var contract = "0xd0f58c52c7d6a554460e20647206773598329747"
 var account = "0x77a5ffdca2a406bd4f8ac99e4ea695165df10ac0"
 var ssTemplate = "ss://AEAD_CHACHA20_POLY1305:test1234@%s"
 
+// const utils = require('web3-utils'); // npm install web3
+// console.log(utils.soliditySha3(0x0))
+var pos = "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+
+// Discovery  1
+// input :c channel used for nodify
+// return value: slice of discovered hosts
 func Discovery(c chan int) []string {
 
-	var hosts []string
 	cli, err := ethclient.Dial(ethaddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	byteData := getContractData(cli)
-	// remove "0x" and "\x0e" and "$"(0x24) and "0"
-	//log.Printf("byteData:%v", strings.TrimRight(strings.TrimRight(strings.TrimRight(strings.TrimLeft(common.ToHex(byteData), "0x"), "0e"), "24"), "0"))
-	newHost, err := hex.DecodeString(strings.TrimRight(strings.TrimRight(strings.TrimRight(strings.TrimLeft(common.ToHex(byteData), "0x"), "0e"), "24"), "0"))
+	newHost := getContractData(cli)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	newAddr := fmt.Sprintf(ssTemplate, string(newHost))
-	hosts = append(hosts, string(newAddr))
-	log.Println("get proxy server from eth contract:", hosts)
-	return hosts
+	logf("get proxy server from eth contract:%v", newHost)
+	return newHost
 }
 
-func getContractData(cli *ethclient.Client) []byte {
+func getContractData(cli *ethclient.Client) []string {
 
 	contractid := common.HexToAddress(contract)
-	//pos := common.HexToHash("0")
-	pos := common.HexToHash("0")
+	posShort := common.HexToHash("0")
+	posLong := "290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
 
-	ret, err := cli.PendingStorageAt(context.Background(), contractid, pos)
+	byteData, err := cli.PendingStorageAt(context.Background(), contractid, posShort)
 	if err != nil {
-		log.Println("get contract data error occurs:", err)
+		logf("get contract data error occurs:%v", err)
 	}
 
-	return ret
+	// remove "0x" and "\x0e" and "$"(0x24) and "0"
+	//log.Printf("byteData:%v", strings.TrimRight(strings.TrimRight(strings.TrimRight(strings.TrimLeft(common.ToHex(byteData), "0x"), "0e"), "24"), "0"))
+	decodeData, err := hex.DecodeString(strings.TrimRight(strings.TrimRight(strings.TrimRight(strings.TrimLeft(common.ToHex(byteData), "0x"), "0e"), "24"), "0"))
+	if err != nil {
+		logf("get contract data error occurs:%v", err)
+	}
+	if len(decodeData) < 5 {
+		decodeData = []byte {}
+		for {
+			p, err := cli.PendingStorageAt(context.Background(), contractid, common.HexToHash(posLong))
+			if err != nil {
+				break
+			}
+			strData := strings.TrimRight(strings.TrimRight(strings.TrimRight(strings.TrimLeft(common.ToHex(p), "0x"), "0e"), "24"), "0")
+			q, _ := hex.DecodeString(strData)
+
+			logf(common.ToHex(p), strData, q, string(q))
+			if strings.TrimRight(strData, "0") == "" {
+				break
+			} else {
+				decodeData = append(decodeData, q...)
+			}
+
+			posLong = hexAddition(posLong)
+		}
+	}
+
+	return strings.Split(string(decodeData), ",")
+}
+
+func hexAddition(s string) string {
+	h := new(big.Int)
+	h.SetString(s, 16)
+	int1 := new(big.Int)
+	int1.SetString("1", 16)
+	h = h.Add(h, int1)
+	return h.Text(16)
 }
 
 func accountBalance(cli *ethclient.Client) {

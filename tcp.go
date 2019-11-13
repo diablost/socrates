@@ -81,6 +81,8 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 							server = proxy
 							logf("success reDial to server %v", server)
 							break
+						} else {
+							logf("retry dial to server:%v failed:%v", proxy, err)
 						}
 					}
 				}
