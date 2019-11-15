@@ -42,6 +42,7 @@ func main() {
 		Discovery  bool
 		Plugin     string
 		PluginOpts string
+		Obfs       string
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
@@ -62,6 +63,7 @@ func main() {
 	flag.StringVar(&flags.PluginOpts, "plugin-opts", "", "Set SIP003 plugin options. (e.g., \"server;tls;host=mydomain.me\")")
 	flag.DurationVar(&config.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
 	flag.StringVar(&flags.AccessList, "accesslist", "", "remote access whitelist")
+	flag.StringVar(&flags.Obfs, "obfs", "http", "obfuscating by http/tls")
 	flag.Parse()
 
 	if flags.Keygen > 0 {
@@ -84,6 +86,14 @@ func main() {
 		}
 		key = k
 	}
+
+	var obfs string
+	if flags.Obfs == "tls"{
+		obfs = "tls"
+	} else {
+		obfs = "http"
+	}
+	logf("use obfs-%v", obfs)
 
 	var ac AccessControl
 	if flags.AccessList != "" {
@@ -132,13 +142,13 @@ func main() {
 		if flags.TCPTun != "" {
 			for _, tun := range strings.Split(flags.TCPTun, ",") {
 				p := strings.Split(tun, "=")
-				go tcpTun(p[0], addr, p[1], ciph.StreamConn)
+				go tcpTun(p[0], addr, p[1], ciph.StreamConn, obfs)
 			}
 		}
 
 		if flags.Socks != "" {
 			socks.UDPEnabled = flags.UDPSocks
-			go socksLocal(flags.Socks, addr, ciph.StreamConn)
+			go socksLocal(flags.Socks, addr, ciph.StreamConn, obfs)
 			if flags.UDPSocks {
 				go udpSocksLocal(flags.Socks, udpAddr, ciph.PacketConn)
 			}
@@ -181,7 +191,7 @@ func main() {
 		}
 
 		go udpRemote(udpAddr, ciph.PacketConn)
-		go tcpRemote(addr, ciph.StreamConn, ac)
+		go tcpRemote(addr, ciph.StreamConn, ac, obfs)
 	}
 
 	sigCh := make(chan os.Signal, 1)

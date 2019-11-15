@@ -197,31 +197,32 @@ func increment(b []byte) {
 type streamConn struct {
 	net.Conn
 	Cipher
+	obfs string
 	r *reader
 	w *writer
-
 }
 
 func (c *streamConn) initReader() error {
-
-	i := 0
-	buf := make([]byte, 1)
-	slots := make([]byte, 4)
-	header := []byte{13, 10, 13, 10}
-	for {
-		_, err := io.ReadFull(c.Conn, buf)
-		if err != nil {
-			return err
-		}
-		if buf[0] == 13 || buf[0] == 10 {
-			slots[i] = buf[0]
-			if i == 3 && bytes.Compare(slots, header) == 0 {
-				break
+	if c.obfs == "http" {
+		i := 0
+		buf := make([]byte, 1)
+		slots := make([]byte, 4)
+		header := []byte{13, 10, 13, 10}
+		for {
+			_, err := io.ReadFull(c.Conn, buf)
+			if err != nil {
+				return err
 			}
-			i++
-		} else {
-			i = 0
-			slots = []byte{0, 0, 0, 0}
+			if buf[0] == 13 || buf[0] == 10 {
+				slots[i] = buf[0]
+				if i == 3 && bytes.Compare(slots, header) == 0 {
+					break
+				}
+				i++
+			} else {
+				i = 0
+				slots = []byte{0, 0, 0, 0}
+			}
 		}
 	}
 
@@ -267,7 +268,11 @@ func (c *streamConn) initWriter() error {
 		return err
 	}
 
-	err = obfs.HTTPRequest(c.Conn, salt)
+	if c.obfs == "http" {
+		err = obfs.HTTPRequest(c.Conn, salt)
+	} else {
+		_, err = c.Conn.Write(salt) 
+	}
 
 	if err != nil {
 		return err
@@ -295,4 +300,4 @@ func (c *streamConn) ReadFrom(r io.Reader) (int64, error) {
 }
 
 // NewConn wraps a stream-oriented net.Conn with cipher.
-func NewConn(c net.Conn, ciph Cipher) net.Conn { return &streamConn{Conn: c, Cipher: ciph} }
+func NewConn(c net.Conn, ciph Cipher, obfs string) net.Conn { return &streamConn{Conn: c, Cipher: ciph, obfs: obfs} }
