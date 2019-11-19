@@ -45,7 +45,7 @@ func main() {
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
-	flag.BoolVar(&flags.Discovery, "discovery", false, "proxy address discovery mode")
+	flag.BoolVar(&flags.Discovery, "discovery", false, "(client-only) Proxy address discovery mode")
 	flag.StringVar(&flags.Cipher, "cipher", "AEAD_CHACHA20_POLY1305", "available ciphers: "+strings.Join(core.ListCipher(), " "))
 	flag.StringVar(&flags.Key, "key", "", "base64url-encoded key (derive from password if empty)")
 	flag.IntVar(&flags.Keygen, "keygen", 0, "generate a base64url-encoded random key of given length in byte")
@@ -59,8 +59,8 @@ func main() {
 	flag.StringVar(&flags.TCPTun, "tcptun", "", "(client-only) TCP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
 	flag.StringVar(&flags.UDPTun, "udptun", "", "(client-only) UDP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
 	flag.DurationVar(&config.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
-	flag.StringVar(&flags.AccessList, "accesslist", "", "remote access whitelist")
-	flag.StringVar(&flags.Obfs, "obfs", "http", "obfuscating by http/tls")
+	flag.StringVar(&flags.AccessList, "accesslist", "", "(server-only) Remote access whitelist")
+	flag.StringVar(&flags.Obfs, "obfs", "http", "Obfuscating by http/tls")
 	flag.Parse()
 
 	if flags.Keygen > 0 {
