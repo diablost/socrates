@@ -141,7 +141,6 @@ func tcpRemote(addr string, shadow func(net.Conn, string) net.Conn, ac AccessCon
 			}
 
 			// access control
-			// traffic control
 			if ac.access(tgt.String()) == false {
 				return
 			}

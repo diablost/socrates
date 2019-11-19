@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -97,10 +98,12 @@ func main() {
 
 	var ac AccessControl
 	if flags.AccessList != "" {
-		mapAccess := make(map[string] bool)
+		mapAccess := make(map[string] regexp.Regexp)
 		ar := strings.Split(flags.AccessList, ",")
 		for i := range ar {
-			mapAccess[ar[i]] = true
+			regStr := fmt.Sprintf(`%s`, ar[i])
+			reg, _ := regexp.Compile(regStr)
+			mapAccess[ar[i]] = *reg
 		}
 		ac.whiteList = mapAccess
 	}

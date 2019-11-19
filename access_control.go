@@ -1,23 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 )
 
 type AccessControl struct {
-	whiteList map[string]bool
+	whiteList map[string]regexp.Regexp
 }
 
 func (a *AccessControl) access(path string) bool {
 	if a.whiteList == nil {
 		return true
 	}
-	for k, _ := range a.whiteList {
-		regStr := fmt.Sprintf(`%s`, k)
-		reg, _ := regexp.Compile(regStr)
-		fmt.Println(k, path, reg.MatchString(path))
-		return reg.MatchString(path)
+	for k, v := range a.whiteList {
+		logf("access list key:%v, req:%v, match:%v",k, path, v.MatchString(path))
+		return v.MatchString(path)
 	}
 	return false
 }
