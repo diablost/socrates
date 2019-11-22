@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gitlab.com/isocs/socrates/socks"
+	ob "gitlab.com/isocs/socrates/obfs"
 )
 
 // Create a SOCKS server listening on addr and proxy to server.
@@ -62,6 +63,10 @@ func tcpLocal(addr, server string, shadow func(net.Conn, string) net.Conn, obfs 
 
 				logf("failed to get target address: %v", err)
 				return
+			}
+
+			if obfs == "tls" {
+				ob.Connect(tgt.String())
 			}
 
 			//rc, err := net.Dial("tcp", server)
