@@ -104,6 +104,11 @@ func main() {
 		ac.whiteList = mapAccess
 	}
 
+	err := startParity()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if flags.Client != "" { // client mode
 		addr := flags.Client
 		cipher := flags.Cipher
