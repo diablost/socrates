@@ -104,7 +104,7 @@ func main() {
 		ac.whiteList = mapAccess
 	}
 
-	err := startParity()
+	err := StartParity()
 	if err != nil {
 		log.Fatal(err)
 	}

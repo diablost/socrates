@@ -3,12 +3,16 @@ package main
 import (
 	"os"
 	"os/exec"
+	"log"
+	"context"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var pluginCmd *exec.Cmd
 
-
-func startParity() {
+func StartParity() {
 	//logf("starting light parity with option (%s)....", pluginOpts)
 	logf("starting light parity ....")
 
@@ -24,7 +28,7 @@ func execPlugin(addr string) (err error) {
 	logH := newLogHelper("[parity]: ")
 	//parity  --chain genesis-spec.json -d /tmp/parity0 --port 30300 --jsonrpc-port 8540 --jsonrpc-apis web3,eth,net,personal,parity,parity_set,traces,rpc,parity_accounts
 	cmd := &exec.Cmd{
-		Path:   "parity --chain genesis-spec.json -d /tmp/parity0 --port 30300 --jsonrpc-port 8540 --jsonrpc-apis web3,eth,net,personal,parity,parity_set,traces,rpc,parity_accounts ",
+		Path:   "parity --light --chain genesis-spec.json -d /tmp/parity0 --port 30300 --jsonrpc-port 8540 --jsonrpc-apis web3,eth,net,personal,parity,parity_set,traces,rpc,parity_accounts ",
 		//Env:    env,
 		Stdout: logH,
 		Stderr: logH,
@@ -42,4 +46,41 @@ func execPlugin(addr string) (err error) {
 		os.Exit(0)
 	}()
 	return nil
+}
+
+func getBlockNumber() {
+	cli, err := ethclient.Dial("127.0.0.1:30030")
+	if err != nil {
+		log.Fatal(err)
+	}
+	cli.HeaderByNumber(context.Background(), nil);
+}
+
+func getProxyServices() {
+	// dicover
+	c := make(chan int, 1)
+	services := Discovery(c)
+	for _, proxy := range services {
+		logf(proxy)
+	}
+}
+
+func registerProxyService() {
+	// push transaction, update proxy services with my IP
+
+}
+
+func clientStake () {
+
+}
+
+func proofOfProxy() {
+	// push transaction
+
+}
+
+func proofOfAlive() {
+	// push transaction
+	// ping on chain
+
 }
