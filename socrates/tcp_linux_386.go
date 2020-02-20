@@ -1,4 +1,4 @@
-package main
+package socrates
 
 import (
 	"syscall"

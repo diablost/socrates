@@ -1,4 +1,4 @@
-package main
+package mobile
 
 import (
 	"crypto/rand"
@@ -13,14 +13,14 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
-	"time"
 
 	"gitlab.com/isocs/socrates/core"
 	"gitlab.com/isocs/socrates/socks"
 	sct "gitlab.com/isocs/socrates/socrates"
 )
 
-func main() {
+func Test123() {
+	fmt.Println("golang mobile 2222")
 
 	var flags struct {
 		Client     string
@@ -40,24 +40,31 @@ func main() {
 		Obfs       string
 	}
 
-	flag.BoolVar(&sct.Verbose, "verbose", false, "verbose mode")
-	flag.BoolVar(&flags.Discovery, "discovery", false, "(client-only) Proxy address discovery mode")
-	flag.StringVar(&flags.Cipher, "cipher", "AEAD_CHACHA20_POLY1305", "available ciphers: "+strings.Join(core.ListCipher(), " "))
-	flag.StringVar(&flags.Key, "key", "", "base64url-encoded key (derive from password if empty)")
-	flag.IntVar(&flags.Keygen, "keygen", 0, "generate a base64url-encoded random key of given length in byte")
-	flag.StringVar(&flags.Password, "password", "", "password")
-	flag.StringVar(&flags.Server, "s", "", "server listen address or url")
-	flag.StringVar(&flags.Client, "c", "", "client connect address or url")
-	flag.StringVar(&flags.Socks, "socks", "", "(client-only) SOCKS listen address")
-	flag.BoolVar(&flags.UDPSocks, "u", false, "(client-only) Enable UDP support for SOCKS")
-	flag.StringVar(&flags.RedirTCP, "redir", "", "(client-only) redirect TCP from this address")
-	flag.StringVar(&flags.RedirTCP6, "redir6", "", "(client-only) redirect TCP IPv6 from this address")
-	flag.StringVar(&flags.TCPTun, "tcptun", "", "(client-only) TCP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
-	flag.StringVar(&flags.UDPTun, "udptun", "", "(client-only) UDP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
-	flag.DurationVar(&sct.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
-	flag.StringVar(&flags.AccessList, "accesslist", "", "(server-only) Remote access whitelist")
-	flag.StringVar(&flags.Obfs, "obfs", "http", "Obfuscating by http/tls")
-	flag.Parse()
+	//flag.BoolVar(&sct.Verbose, "verbose", false, "verbose mode")
+	//flag.BoolVar(&flags.Discovery, "discovery", false, "(client-only) Proxy address discovery mode")
+	//flag.StringVar(&flags.Cipher, "cipher", "AEAD_CHACHA20_POLY1305", "available ciphers: "+strings.Join(core.ListCipher(), " "))
+	//flag.StringVar(&flags.Key, "key", "", "base64url-encoded key (derive from password if empty)")
+	//flag.IntVar(&flags.Keygen, "keygen", 0, "generate a base64url-encoded random key of given length in byte")
+	//flag.StringVar(&flags.Password, "password", "", "password")
+	//flag.StringVar(&flags.Server, "s", "", "server listen address or url")
+	//flag.StringVar(&flags.Client, "c", "", "client connect address or url")
+	//flag.StringVar(&flags.Socks, "socks", "", "(client-only) SOCKS listen address")
+	//flag.BoolVar(&flags.UDPSocks, "u", false, "(client-only) Enable UDP support for SOCKS")
+	//flag.StringVar(&flags.RedirTCP, "redir", "", "(client-only) redirect TCP from this address")
+	//flag.StringVar(&flags.RedirTCP6, "redir6", "", "(client-only) redirect TCP IPv6 from this address")
+	//flag.StringVar(&flags.TCPTun, "tcptun", "", "(client-only) TCP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
+	//flag.StringVar(&flags.UDPTun, "udptun", "", "(client-only) UDP tunnel (laddr1=raddr1,laddr2=raddr2,...)")
+	//flag.DurationVar(&sct.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
+	//flag.StringVar(&flags.AccessList, "accesslist", "", "(server-only) Remote access whitelist")
+	//flag.StringVar(&flags.Obfs, "obfs", "http", "Obfuscating by http/tls")
+	//flag.Parse()
+	
+	//"-c","ss://AEAD_CHACHA20_POLY1305:test1234@13.230.37.28:28488"
+	//"-discovery", "-verbose", "-socks", ":1088", "-obfs", "http"
+	flags.Client = "ss://AEAD_CHACHA20_POLY1305:test1234@qianmen.xyz:8488"
+	flags.Discovery = true
+	flags.Socks = ":1080"
+	flags.Obfs = "http"
 
 	if flags.Keygen > 0 {
 		key := make([]byte, flags.Keygen)

@@ -1,4 +1,4 @@
-package main
+package socrates
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"log"
 	"context"
 
-	"github.com/ethereum/go-ethereum/common"
+	//"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 

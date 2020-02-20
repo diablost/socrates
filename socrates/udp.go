@@ -1,4 +1,4 @@
-package main
+package socrates
 
 import (
 	"fmt"
@@ -18,10 +18,12 @@ const (
 	socksClient
 )
 
+var UDPTimeout = 5 * time.Minute
+
 const udpBufSize = 64 * 1024
 
 // Listen on laddr for UDP packets, encrypt and send to server to reach target.
-func udpLocal(laddr, server, target string, shadow func(net.PacketConn) net.PacketConn) {
+func UdpLocal(laddr, server, target string, shadow func(net.PacketConn) net.PacketConn) {
 	srvAddr, err := net.ResolveUDPAddr("udp", server)
 	if err != nil {
 		logf("UDP server address error: %v", err)
@@ -42,7 +44,7 @@ func udpLocal(laddr, server, target string, shadow func(net.PacketConn) net.Pack
 	}
 	defer c.Close()
 
-	nm := newNATmap(config.UDPTimeout)
+	nm := newNATmap(UDPTimeout)
 	buf := make([]byte, udpBufSize)
 	copy(buf, tgt)
 
@@ -75,7 +77,7 @@ func udpLocal(laddr, server, target string, shadow func(net.PacketConn) net.Pack
 }
 
 // Listen on laddr for Socks5 UDP packets, encrypt and send to server to reach target.
-func udpSocksLocal(laddr, server string, shadow func(net.PacketConn) net.PacketConn) {
+func UdpSocksLocal(laddr, server string, shadow func(net.PacketConn) net.PacketConn) {
 	srvAddr, err := net.ResolveUDPAddr("udp", server)
 	if err != nil {
 		logf("UDP server address error: %v", err)
@@ -89,7 +91,7 @@ func udpSocksLocal(laddr, server string, shadow func(net.PacketConn) net.PacketC
 	}
 	defer c.Close()
 
-	nm := newNATmap(config.UDPTimeout)
+	nm := newNATmap(UDPTimeout)
 	buf := make([]byte, udpBufSize)
 
 	for {
@@ -120,7 +122,7 @@ func udpSocksLocal(laddr, server string, shadow func(net.PacketConn) net.PacketC
 }
 
 // Listen on addr for encrypted packets and basically do UDP NAT.
-func udpRemote(addr string, shadow func(net.PacketConn) net.PacketConn) {
+func UdpRemote(addr string, shadow func(net.PacketConn) net.PacketConn) {
 	c, err := net.ListenPacket("udp", addr)
 	if err != nil {
 		logf("UDP remote listen error: %v", err)
@@ -129,7 +131,7 @@ func udpRemote(addr string, shadow func(net.PacketConn) net.PacketConn) {
 	defer c.Close()
 	c = shadow(c)
 
-	nm := newNATmap(config.UDPTimeout)
+	nm := newNATmap(UDPTimeout)
 	buf := make([]byte, udpBufSize)
 
 	logf("listening UDP on %s", addr)
