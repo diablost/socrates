@@ -4,10 +4,9 @@ import (
 	"io"
 	"net"
 	"time"
-	"fmt"
 
-	"gitlab.com/isocs/socrates/socks"
 	ob "gitlab.com/isocs/socrates/obfs"
+	"gitlab.com/isocs/socrates/socks"
 )
 
 // Create a SOCKS server listening on addr and proxy to server.
@@ -30,7 +29,6 @@ func TcpTun(addr, server, target string, shadow func(net.Conn, string) net.Conn,
 // Listen on addr and proxy to server to reach target from getAddr.
 func tcpLocal(addr, server string, shadow func(net.Conn, string) net.Conn, obfs string, getAddr func(net.Conn) (socks.Addr, error)) {
 	l, err := net.Listen("tcp", addr)
-	fmt.Println("golang mobile 111111111111111111111111111")
 	if err != nil {
 		logf("failed to listen on %s: %v", addr, err)
 		return
@@ -72,7 +70,7 @@ func tcpLocal(addr, server string, shadow func(net.Conn, string) net.Conn, obfs 
 			}
 
 			//rc, err := net.Dial("tcp", server)
-			rc, err :=  net.DialTimeout("tcp", server, 2 * time.Second)
+			rc, err := net.DialTimeout("tcp", server, 2*time.Second)
 			if err != nil {
 				logf("failed to connect to server %v: %v", server, err)
 
@@ -83,7 +81,7 @@ func tcpLocal(addr, server string, shadow func(net.Conn, string) net.Conn, obfs 
 					return
 				} else {
 					for _, proxy := range dynamicProxy {
-						rc, err = net.DialTimeout("tcp", proxy, 2 * time.Second)
+						rc, err = net.DialTimeout("tcp", proxy, 2*time.Second)
 						if err == nil {
 							server = proxy
 							logf("success reDial to server %v", server)

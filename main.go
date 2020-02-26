@@ -38,6 +38,7 @@ func main() {
 		AccessList string
 		Discovery  bool
 		Obfs       string
+		HTTPProxy  string
 	}
 
 	flag.BoolVar(&sct.Verbose, "verbose", false, "verbose mode")
@@ -57,6 +58,7 @@ func main() {
 	flag.DurationVar(&sct.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
 	flag.StringVar(&flags.AccessList, "accesslist", "", "(server-only) Remote access whitelist")
 	flag.StringVar(&flags.Obfs, "obfs", "http", "Obfuscating by http/tls")
+	flag.StringVar(&flags.HTTPProxy, "httpproxy", "", "(client-only) HTTP listen address")
 	flag.Parse()
 
 	if flags.Keygen > 0 {
@@ -81,7 +83,7 @@ func main() {
 	}
 
 	var obfs string
-	if flags.Obfs == "tls"{
+	if flags.Obfs == "tls" {
 		obfs = "tls"
 	} else {
 		obfs = "http"
@@ -90,7 +92,7 @@ func main() {
 
 	var ac sct.AccessControl
 	if flags.AccessList != "" {
-		mapAccess := make(map[string] regexp.Regexp)
+		mapAccess := make(map[string]regexp.Regexp)
 		ar := strings.Split(flags.AccessList, ",")
 		for i := range ar {
 			regStr := fmt.Sprintf(`%s`, ar[i])
@@ -137,6 +139,11 @@ func main() {
 				p := strings.Split(tun, "=")
 				go sct.TcpTun(p[0], addr, p[1], ciph.StreamConn, obfs)
 			}
+		}
+
+		// use http local proxy
+		if flags.HTTPProxy != "" {
+			go sct.HTTP2socksProxy(flags.HTTPProxy)
 		}
 
 		if flags.Socks != "" {
