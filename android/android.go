@@ -14,9 +14,9 @@ import (
 	"strings"
 	"syscall"
 
-	"gitlab.com/isocs/socrates/core"
-	"gitlab.com/isocs/socrates/socks"
-	sct "gitlab.com/isocs/socrates/socrates"
+	"github.com/sic-project/socrates/core"
+	"github.com/sic-project/socrates/socks"
+	sct "github.com/sic-project/socrates/socrates"
 )
 
 func Test123() {

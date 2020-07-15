@@ -7,7 +7,7 @@ import (
 	"io"
 	"net"
 
-	"gitlab.com/isocs/socrates/obfs"
+	"github.com/sic-project/socrates/obfs"
 )
 
 // payloadSizeMask is the maximum size of payload in bytes.

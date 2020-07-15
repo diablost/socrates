@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 
-	ob "gitlab.com/isocs/socrates/obfs"
-	"gitlab.com/isocs/socrates/socks"
+	ob "github.com/sic-project/socrates/obfs"
+	"github.com/sic-project/socrates/socks"
 )
 
 // Create a SOCKS server listening on addr and proxy to server.

@@ -7,7 +7,7 @@ A combined proxy derived from go-shadowsocks2
 Install from source
 
 ```sh
-go get -u -v gitlab.com/isocs/socrates
+go get -u -v github.com/sic-project/socrates
 ```
 
 ## Basic Usage
