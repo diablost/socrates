@@ -7,7 +7,7 @@ import (
 
 	"sync"
 
-	"gitlab.com/isocs/socrates/socks"
+	"github.com/sic-project/socrates/socks"
 )
 
 type mode int

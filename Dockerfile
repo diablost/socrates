@@ -5,7 +5,7 @@ ENV GOPROXY https://goproxy.io
 
 RUN apk upgrade \
     && apk add git \
-    && go get gitlab.com/isocs/socrates
+    && go get github.com/sic-project/socrates
 
 FROM alpine:3.10 AS dist
 

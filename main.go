@@ -15,8 +15,8 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.com/isocs/socrates/core"
-	"gitlab.com/isocs/socrates/socks"
+	"github.com/sic-project/socrates/core"
+	"github.com/sic-project/socrates/socks"
 )
 
 var config struct {

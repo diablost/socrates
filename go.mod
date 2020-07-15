@@ -1,4 +1,4 @@
-module gitlab.com/isocs/socrates
+module github.com/sic-project/socrates
 
 go 1.12
 
